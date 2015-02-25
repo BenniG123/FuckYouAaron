@@ -20,7 +20,6 @@ public class Run {
 		// Listens on server runnable thread
 
 		String line = null;
-		Thread current = Thread.currentThread();
 		while (true) {
 			ServerSocket server = new ServerSocket(2048);
 			System.out.println("Listening");
@@ -28,17 +27,21 @@ public class Run {
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					client.getInputStream()));
 			PrintWriter out = new PrintWriter(client.getOutputStream(), true);
-			if(parseLine(line)) {
+			if(parseLine(line, client)) {
 				//Send back confirmation
+				out.println("Success");
 			} else {
-				//Send back negative
+				// back negative
+				out.println("Failure");
 			}
-			
+			client.close();
 		}
 	}
 	
-	private static boolean parseLine(String input) {
+	private static boolean parseLine(String input, Socket client) throws IOException {
+		PrintWriter out = new PrintWriter(client.getOutputStream(), true);
 		if(input == null) {
+			out.println("null");
 			return false;
 		}
 		if (input.contains("url")) {
@@ -52,7 +55,7 @@ public class Run {
 			t.start();
 			return true;
 		} else {
-			//Unknown string
+			out.println("unknown");
 			return false;
 		}
 	}
